@@ -1,5 +1,5 @@
 # Canoga
-Revised version of the famous game Shut The Box built for OPL course at Ramapo College.
+Revised version of the famous game Shut The Box built for OPL course at Ramapo College, built using Python
 
 ## Description of the game: 
 Canoga
