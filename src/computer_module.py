@@ -46,9 +46,9 @@ class Computer(Player):
 
         def to_cover_or_to_uncover(self):
             '''
-                Function Name: get_best_move
-                Purpose: Get the best move
-                Parameters: squares_moves
+                Function Name: to_cover_or_to_uncover
+                Purpose: Decide whether to cover or uncover
+                Parameters: 
                 Return Value: true for cover, false otherwise
                 Algorithm:
                         1) If the opponent has more uncovered squares than self covered, cover own squares
@@ -128,7 +128,6 @@ class Computer(Player):
                     for move in moves:
                         message += str(move) + " " 
                 message += " as there are no squares left to uncover "
-            message = " as there are no squares left to uncover "
 
         # check to see if squares are only available for uncovers
         elif len(uncover_squares_available)> 0 and len(cover_squares_available) <= 0:
@@ -144,11 +143,9 @@ class Computer(Player):
                     for move in moves:
                         message += str(move) + " "    
                 message += " as there are no squares left to cover "
-            message += " as there are no squares left to cover"
             
         elif uncover_squares_available and uncover_squares_available:
             cover_option, reason = to_cover_or_to_uncover(self)
-            message += reason
             if cover_option == "True":
                 moves = get_best_move(self, cover_squares_available)
                 cov_or_uncov = True
