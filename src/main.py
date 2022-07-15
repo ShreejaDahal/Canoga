@@ -128,9 +128,6 @@ class Resume(Screen):
                 number = number.replace(" ", "")
                 self.round_module.dice_rolls.append(number)
 
-        else:
-            self.ids.message.text = (f'The file {filename} does not exist')
-            self.ids.message.disabled = False
 
 class NewGameModeScreen(Screen):
     pass
@@ -336,7 +333,9 @@ class NewGameMainScreen(Screen):
                 self.ids.start.text = "OK"
                 self.ids.start.disabled = False
                 self.round_module.current_player = self.Player.player2_name
-
+                self.ids.player1_roll.disabled = True
+                self.ids.player2_roll.disabled = True
+                
             # set the first player to true, meaning we have a player that goes first
             elif player_1_score > player_2_score:
                 self.Player.player1_first_turn = True
@@ -348,9 +347,12 @@ class NewGameMainScreen(Screen):
                 self.ids.start.text = "OK"
                 self.ids.start.disabled = False
                 self.round_module.current_player = self.Player.player1_name
+                self.ids.player1_roll.disabled = True
+                self.ids.player2_roll.disabled = True
         else:
             self.ids.who_starts.text = "Both players scored " + str(player_1_score) + " It's a tie.  Please reroll"
             self.ids.player1_roll.disabled = False
+
 
     def board_setup(self):
         '''
@@ -386,6 +388,8 @@ class NewGameMainScreen(Screen):
         if hasattr(self.round_module,'resume') :
             if self.round_module.resume:
                 self.round_module.new_round = False
+                self.ids.dice_image1.source = "dice_0.png"
+                self.ids.dice_image2.source = "dice_0.png"
                 self.ids.player1_score.text = str(self.Player.player1_score)
                 self.ids.player2_score.text = str(self.Player.player2_score)
                 self.Player.player1_last_round_score = self.Player.player1_score
@@ -536,6 +540,8 @@ class NewGameMainScreen(Screen):
                     self.round_module.player2_squares[sum - 1] = True
                     iden2 = 'player2Square'+str(sum)          
                     self.ids[iden2].disabled = True
+                    self.ids[iden2].background_disabled_normal= ''
+                    self.ids[iden2].disabled_color= 1, 1, 1, 1
                     self.ids.handicapped.text = "Handicapped placed on " + self.Player.player1_name + "\n" + self.Player.player2_name + " has " + str(sum) + " covered."
                     self.ids.handicapped.disabled = False
                 elif self.round_module.round_winner == self.Player.player2_name:
@@ -550,6 +556,8 @@ class NewGameMainScreen(Screen):
                     self.round_module.player2_squares[sum - 1] = True
                     iden1 = 'player2Square'+str(sum)          
                     self.ids[iden1].disabled = True
+                    self.ids[iden1].background_disabled_normal= ''
+                    self.ids[iden1].disabled_color= 1, 1, 1, 1
                     self.ids.handicapped.text = "Handicapped placed on " + self.Player.player1_name + "\n" + self.Player.player2_name + " has " + str(sum) + " covered."
                     self.ids.handicapped.disabled = False
 
@@ -567,6 +575,8 @@ class NewGameMainScreen(Screen):
                     self.round_module.player1_squares[sum - 1] = True
                     iden2 = 'player1Square'+str(sum)          
                     self.ids[iden2].disabled = True
+                    self.ids[iden2].background_disabled_normal= ''
+                    self.ids[iden2].disabled_color= 1, 1, 1, 1
                     self.ids.handicapped.text = "Handicapped placed on " + self.Player.player2_name + "\n" + self.Player.player1_name + " has " + str(sum) + " covered."
                     self.ids.handicapped.disabled = False
                 
@@ -582,6 +592,8 @@ class NewGameMainScreen(Screen):
                     self.round_module.player1_squares[sum - 1] = True
                     iden2 = 'player1Square'+str(sum)          
                     self.ids[iden2].disabled = True
+                    self.ids[iden2].background_disabled_normal= ''
+                    self.ids[iden2].disabled_color= 1, 1, 1, 1
                     self.ids.handicapped.text = "Handicapped placed on " + self.Player.player2_name + "\n" + self.Player.player1_name + " has " + str(sum) + " covered."
                     self.ids.handicapped.disabled = False
                 
@@ -652,13 +664,7 @@ class NewGameMainScreen(Screen):
                 die2 = int(dice[1])
                 self.Player.player2_total = die1 + die2
                 self.get_dice_pic(die1, die2)
-            self.ids.roll1.disabled = True
-            self.ids.handicapped.disabled = True
-            self.ids.end_game.disabled = True
-            self.ids.play_again9.disabled = True
-            self.ids.play_again10.disabled = True
-            self.ids.play_again11.disabled = True
-            self.ids.play_again12.disabled = True
+            self.resetWidgets()
 
         else:
             if self.round_module.current_player == self.Player.player1_name:
@@ -686,14 +692,29 @@ class NewGameMainScreen(Screen):
                     self.Player.player2_total = die1 + die2
                     self.get_dice_pic(die1, die2)
 
+        self.resetWidgets()
+        self.get_options()
+
+
+    def resetWidgets(self):
+        '''
+        Function Name: resetWidgets
+        Purpose: disables roll,roll1,handicapped,end_game, play_again9, play_again10, play_again11, and play_again12 widgets 
+        Parameters: self
+        Return Value:
+        Algorithm:
+                disables roll,roll1,handicapped,end_game, play_again9, play_again10, play_again11, and play_again12 widgets 
+        Assistance Received: none
+        '''
         self.ids.roll1.disabled = True
+        self.ids.roll.disabled = True
         self.ids.handicapped.disabled = True
         self.ids.end_game.disabled = True
         self.ids.play_again9.disabled = True
         self.ids.play_again10.disabled = True
         self.ids.play_again11.disabled = True
         self.ids.play_again12.disabled = True
-        self.get_options()
+
 
     def act_cover(self, identifier):
         '''
@@ -943,7 +964,7 @@ class NewGameMainScreen(Screen):
 
         if self.round_module.current_player == "Computer":
             hint = False
-            moves, cover_or_uncover, message = self.Computer.make_a_move(self,self.round_module.coverables, self.round_module.uncoverables, hint)            
+            moves, cover_or_uncover, message = self.Computer.make_a_move(self,self.round_module.coverables, self.round_module.uncoverables, hint)           
             if cover_or_uncover:
                 if moves:
                     sentence += self.round_module.current_player + " covered  " + str(moves) + message 
@@ -979,7 +1000,8 @@ class NewGameMainScreen(Screen):
                 self.ids.uncover_options.add_widget(buttons2)
                 buttons2.bind(on_press= self.act_uncover)
                 self.ids.uncover_options.disabled = False
-        self.ids.help.disabled = False
+            self.ids.help.disabled = False
+            self.ids.roll1.disabled = True
 
 
     def getAllCombinations(self, list_squares, K):
@@ -1107,25 +1129,13 @@ class NewGameMainScreen(Screen):
                     for item in self.Player.covered_squares_player1(self):
                         self.Player.player1_last_round_score += int(item)
                         self.Player.player1_score += int(item)
-                    self.round_winner_score = self.Player.player1_score    
+                    self.round_winner_score = self.Player.player1_score
                     self.round_module.winning_score = self.round_winner_score
                     self.ids.winner.text = self.Player.player1_name + " uncovered all of " + self.Player.player2_name + "'s squares and is declared the winner for this round. \n Current score is:" + " Human: " + str(self.Player.player1_score) + "  Computer:  "+ str(self.Player.player2_score) +  " Play again? \n If yes, select a square."
                     self.ids.winner.disabled = False
                     self.ids.player1_score.text = str(self.Player.player1_last_round_score)
+                self.resetWidgetsAfterGame()
 
-                #if self.ids.roll1.disabled is False or self.ids.roll1.disabled is True:
-                self.ids.roll1.disabled = True
-                self.ids.roll.disabled = True
-                self.ids.turn.disabled = True
-                self.ids.dice_image1.opacity = 0
-                self.ids.dice_image2.opacity = 0
-                self.ids.save.disabled = True
-                #self.ids.play_again.disabled = False
-                self.ids.play_again9.disabled = False
-                self.ids.play_again10.disabled = False
-                self.ids.play_again11.disabled = False
-                self.ids.play_again12.disabled = False
-                self.ids.end_game.disabled = False
 
         elif self.round_module.current_player == self.Player.player2_name:
             self.Player.player1_score = 0
@@ -1150,18 +1160,8 @@ class NewGameMainScreen(Screen):
                     self.ids.winner.text += self.Player.player2_name + " uncovered all of " + self.Player.player1_name + "'s square and is declared the winner for this round. \n Current score is:" + "  Human:  " + str(self.Player.player1_score) + " Computer:  "+ str(self.Player.player2_score) +  " Play again? \n If yes, select a square."
                     self.ids.winner.disabled = False
                     self.ids.player2_score.text = str(self.Player.player2_last_round_score )
-                
-                self.ids.roll1.disabled = True
-                self.ids.roll.disabled = True
-                self.ids.turn.disabled = True
-                self.ids.dice_image1.opacity = 0
-                self.ids.dice_image2.opacity = 0
-                self.ids.save.disabled = True
-                self.ids.play_again9.disabled = False
-                self.ids.play_again10.disabled = False
-                self.ids.play_again11.disabled = False
-                self.ids.play_again12.disabled = False
-                self.ids.end_game.disabled = False
+                self.resetWidgetsAfterGame()
+
 
     def checkIfNextRound(self, coverables, uncoverables):
         '''
@@ -1184,6 +1184,7 @@ class NewGameMainScreen(Screen):
                 self.round_module.winning_score = 0
                 self.ids.who_starts.text = ""
                 self.ids.who_starts.disabled = True
+                self.ids.roll.disabled = False
                 self.checkIfWon()
 
             elif self.round_module.current_player == self.Player.player2_name:
@@ -1195,15 +1196,12 @@ class NewGameMainScreen(Screen):
                 self.round_module.winning_score = 0
                 self.ids.who_starts.text = ""
                 self.ids.who_starts.disabled = True
+                self.ids.roll.disabled = False
                 self.checkIfWon()
-        
-        #if self.round_module.new_round_first_turn:
-        #    if (len(coverables) == 0):
-        #        self.checkIfWon()
 
-        #self.round_module.new_round_first_turn = False
         self.ids.turn.text =  self.round_module.current_player + "'s turn"
         self.ids.turn.disabled = False
+        self.ids.roll.text = "Roll"
         self.ids.roll.disabled = False
         self.ids.winner.disabled = True
 
@@ -1211,7 +1209,7 @@ class NewGameMainScreen(Screen):
         '''
         Function Name: saveGame
         Purpose: To save the current game
-        Parameters: 
+        Parameters:
         Return Value:
         Algorithm:
                 1) Create a file according named as the current time
@@ -1439,37 +1437,40 @@ class NewGameMainScreen(Screen):
             if self.Player.isCovered_player1(self):
                 self.ids.winner.text = str(self.Player.player1_name) + " covered all its square and is declared the winner of this round. \n Current score is:" + " Human:  " + str(self.Player.player1_score) + "  Computer:  "+ str(self.Player.player2_score) +  " Play again? \n If yes, select a square."
                 self.ids.winner.disabled = False
-                self.ids.roll1.disabled = True
-                self.ids.roll.disabled = True
-                self.ids.turn.disabled = True
-                self.ids.dice_image1.opacity = 0
-                self.ids.dice_image2.opacity = 0
-                self.ids.save.disabled = True
-                self.ids.play_again9.disabled = False
-                self.ids.play_again10.disabled = False
-                self.ids.play_again11.disabled = False
-                self.ids.play_again12.disabled = False
-                self.ids.end_game.disabled = False
-
+                self.resetWidgetsAfterGame()
 
 
         elif self.round_module.current_player == self.Player.player2_name:
             if self.Player.isCovered_player2(self):
                 self.ids.winner.text = str(self.Player.player2_name) + " covered all its square and is declared the winner of this round. \n Current score is:" + " Human:  " + str(self.Player.player1_score) + "  Computer:  "+ str(self.Player.player2_score) +  " Play again? \n If yes, select a square."
                 self.ids.winner.disabled = False
-                self.ids.roll1.disabled = True
-                self.ids.roll.disabled = True
-                self.ids.turn.disabled = True
-                self.ids.dice_image1.opacity = 0
-                self.ids.dice_image2.opacity = 0
-                self.ids.save.disabled = True
-                self.ids.play_again9.disabled = False
-                self.ids.play_again10.disabled = False
-                self.ids.play_again11.disabled = False
-                self.ids.play_again12.disabled = False
-                self.ids.end_game.disabled = False
+                self.resetWidgetsAfterGame()
 
 
+    def resetWidgetsAfterGame(self):
+        '''
+        Function Name: resetWidgetsAfterGame
+        Purpose: enable widgets after a round has a winner
+        Parameters: self
+        Return Value:
+        Algorithm:
+                disables roll,roll1,turn, dice_image1, dice_image2,save,
+                handicapped,end_game, play_again9, play_again10, play_again11, and play_again12 widgets 
+        Assistance Received: none
+        '''
+
+        self.ids.roll1.disabled = True
+        self.ids.roll.disabled = True
+        self.ids.turn.disabled = True
+        self.ids.dice_image1.opacity = 0
+        self.ids.dice_image2.opacity = 0
+        self.ids.save.disabled = True
+        self.ids.play_again9.disabled = False
+        self.ids.play_again10.disabled = False
+        self.ids.play_again11.disabled = False
+        self.ids.play_again12.disabled = False
+        self.ids.end_game.disabled = False
+        
 
 class WindowManager(ScreenManager):
     pass
