@@ -127,7 +127,7 @@ class Computer(Player):
                 else:
                     for move in moves:
                         message += str(move) + " " 
-                message += " as there are no squares left to uncover "
+            message += " as there are no squares left to uncover "
 
         # check to see if squares are only available for uncovers
         elif len(uncover_squares_available)> 0 and len(cover_squares_available) <= 0:
@@ -142,7 +142,7 @@ class Computer(Player):
                 else:    
                     for move in moves:
                         message += str(move) + " "    
-                message += " as there are no squares left to cover "
+            message += " as there are no squares left to cover "
             
         elif uncover_squares_available and uncover_squares_available:
             cover_option, reason = to_cover_or_to_uncover(self)
@@ -156,7 +156,7 @@ class Computer(Player):
                     else:
                         for move in moves:
                             message += str(move) + " "
-                    message += reason    
+                message += reason
             else:
                 moves = get_best_move(self, uncover_squares_available)
                 cov_or_uncov = False
@@ -168,7 +168,7 @@ class Computer(Player):
                     else:
                         for move in moves:
                             message += str(move) + " "
-                    message += reason    
+                message += reason
             
         return moves, cov_or_uncov, message
 
